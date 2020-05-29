@@ -114,19 +114,19 @@ https://bit.ly/39rLNoE
 
 **This weights must be put in the root folder of the repository. They are the pretrained weights for the backend only and will be loaded during model creation. The code does not work without this weights.**
 
-### 3. Generate anchors for your dataset (optional)
+### 4. Generate anchors for your dataset (optional)
 
 `python gen_anchors.py -c config.json`
 
 Copy the generated anchors printed on the terminal to the ```anchors``` setting in ```config.json```.
 
-### 4. Start the training process
+### 5. Start the training process
 
 `python train.py -c config.json`
 
 By the end of this process, the code will write the weights of the best model to file best_weights.h5 (or whatever name specified in the setting "saved_weights_name" in the config.json file). The training process stops when the loss on the validation set is not improved in 3 consecutive epoches.
 
-### 5. Perform detection using trained weights on image, set of images, video, or webcam
+### 6. Perform detection using trained weights on image, set of images, video, or webcam
 `python predict.py -c config.json -i /path/to/image/or/video`
 
 It carries out detection on the image and write the image with detected bounding boxes to the same folder.
