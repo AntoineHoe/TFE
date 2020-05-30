@@ -3,6 +3,7 @@
 
 import imgaug as ia
 ia.seed(1)
+import argparse
 # imgaug uses matplotlib backend for displaying images
 from imgaug.augmentables.bbs import BoundingBox, BoundingBoxesOnImage
 from imgaug import augmenters as iaa 
@@ -16,6 +17,54 @@ import glob
 # this library is needed to read XML files for converting it into CSV
 import xml.etree.ElementTree as ET
 import shutil
+import os
+#print(imgaug.__version__)
+
+def del_unique_file():
+
+    list_aug_annot = os.listdir("aug_annot/")
+    list_aug_img = os.listdir("aug_images/")
+
+    #Liste les fichiers d'annotations sans leur extension .xml
+    img_without_extension_list = []
+    for img in list_aug_img:
+        img = img[:-4]
+        img_without_extension_list.append(img)
+
+    #liste les images augmentées sans leur extension .jpg
+    annot_without_extension_list = []
+    for annot in list_aug_annot:
+        annot = annot[:-4]
+        annot_without_extension_list.append(annot)
+
+    lonely__img_files = []
+    lonely__annot_files = []
+
+    #verifie si l'annotation a bien son alter-ego dans le dossier image
+    #supprime les annotations sans fichier image
+    for a in annot_without_extension_list:
+        if a not in img_without_extension_list:
+            lonely__annot_files.append(a)
+    if len(lonely__annot_files)>0:
+        for element in lonely__annot_files :
+            print("{} not exist in the augmented image folder".format(element))
+            os.remove("aug_annot/{}.xml".format(element))
+            print("{}.xml have been deleted".format(element))
+    else:
+        print("Every annotation has his image file")
+
+    #verifie si l'image a bien son alter-ego dans le dossier annotation
+    #supprime les images sans annotations
+    for i in img_without_extension_list:
+        if i not in annot_without_extension_list:
+            lonely__img_files.append(i)
+    if len(lonely__img_files)>0:
+        for element in lonely__img_files :
+            print("{} does not exist in the augmentated annotation folder".format(element))
+            os.remove("aug_images/{}.jpg".format(element))
+            print("{}.jpg have been deleted".format(element))
+    else:
+        print("Every image has his annotation file")
 
 def xml_builder(data):
     
@@ -137,10 +186,14 @@ def image_aug(df, images_path, aug_images_path, image_prefix, augmentor):
     # return dataframe with updated images and bounding boxes annotations 
     aug_bbs_xy = aug_bbs_xy.reset_index()
     aug_bbs_xy = aug_bbs_xy.drop(['index'], axis=1)
-    print("done")
-    print("{} augmented images have reach an issue :".format(len(defect_augmented_img)))
-    for element in defect_augmented_img:
-        print(element)
+
+    #Display info about the augmentation failure
+    if(len(defect_augmented_img)>0):
+        print("{} augmented images have reach an issue :".format(len(defect_augmented_img)))
+        for element in defect_augmented_img:
+            print(element)
+    else:
+        print("All images have been augmented")
 
     return aug_bbs_xy
 
@@ -158,7 +211,7 @@ def parser(data):
 def xml_to_csv(path):
     xml_list = []
     column_name = ['filename', 'width', 'height', 'name', 'xmin', 'ymin', 'xmax', 'ymax']
-    defect_list = ["Crack", "Spallation", "Efflorescence", "ExposedBars", "CorrosionStain"]
+    #defect_list = ["Crack", "Spallation", "Efflorescence", "ExposedBars", "CorrosionStain"]
     for xml_file in glob.glob(path + '/*.xml'):
         # empty all the list for each new xml file
         basic_img_info =[]
@@ -171,27 +224,20 @@ def xml_to_csv(path):
             #all the information we need is add in one list
             for tag, text in results:
                 img.append(text)
-        #print(img)
 
         #the img list looks like this : 
-
         # ['filename', 'width', 'height', 'name', 'xmin', 'ymin', 'xmax', 'ymax',  'name' ,[...] 'ymin', 'xmax', 'ymax']
-
         # with a repeted sequence ['name', 'xmin', 'ymin', 'xmax', 'ymax'] for each defect contained in the xml file
 
 
         #if the list contain more than 1 defect
         while len(img) > 8:
 
-            #we selected the last 5 data of the big list: ['name', 'xmin', 'ymin', 'xmax', 'ymax']
-
-            #and add it to the basic image info : ['filename', 'width', 'height']
-
-            #then we delete the last 5 data of the big list
-
+            # we selected the last 5 data of the big list: ['name', 'xmin', 'ymin', 'xmax', 'ymax']
+            # and add it to the basic image info : ['filename', 'width', 'height']
+            # then we delete the last 5 data of the big list
             # and we go on again and again
-
-            #until the list contain only 1 defect : ['filename', 'width', 'height', 'name', 'xmin', 'ymin', 'xmax', 'ymax']
+            # until the list contain only 1 defect : ['filename', 'width', 'height', 'name', 'xmin', 'ymin', 'xmax', 'ymax']
 
             basic_img_info = img[0:3]
 
@@ -204,36 +250,75 @@ def xml_to_csv(path):
         xml_list.append(img)
         # for element in xml_list :
         #     print(element)
-    print(len(xml_list)) #8323
+    print("Number of defect : {}".format(len(xml_list))) #8323
     xml_df = pd.DataFrame(xml_list, columns=column_name)
     
     return xml_df
 
-aug = iaa.SomeOf(2, [    
-    # iaa.Affine(scale=(0.5, 1.5)),
-    # iaa.Affine(rotate=(-30, 30)),
-    # iaa.Affine(translate_percent={"x":(-0.2, 0.2),"y":(-0.2, 0.2)}),
-    iaa.Fliplr(1),
-    iaa.SaltAndPepper(0.1, per_channel=True),
-    iaa.Solarize(0.5, threshold=(32, 128)),
-    iaa.WithHueAndSaturation(iaa.WithChannels(0, iaa.Add((0, 50))))
+def _main_(args) :
     
-])
+    number_of_data_augmentation = int(args.number_of_dataset_augmentation)
+    last_gen = int(args.number_of_the_last_dataset_augmentation)
 
-labels_df = xml_to_csv('train_image_folder/')
-labels_df.to_csv(('labels.csv'), index=None)
+    aug = iaa.SomeOf(2, [    
+        # FIRST GEN OF DATA AUGMENTATION
+        iaa.Affine(scale=(0.8, 1.2)),
+        iaa.Affine(rotate=(-30, 30)),
+        iaa.Affine(translate_percent={"x":(-0.2, 0.2),"y":(-0.2, 0.2)}),
+        iaa.Fliplr(1)
 
-augmented_images_df = image_aug(labels_df, 'train_image_folder/', 'aug_images/', 'aug1_', aug)
+        # iaa.SaltAndPepper(0.1, per_channel=True),
+        # iaa.Add((-40, 40), per_channel=0.5),
+        # iaa.AdditiveGaussianNoise(scale=(0, 0.2*255)),
+        # iaa.Multiply((0.5, 1.5), per_channel=0.5),
+        # iaa.AverageBlur(k=((5, 11), (1, 3))),
+        # iaa.WithColorspace(to_colorspace="HSV",from_colorspace="RGB",children=iaa.WithChannels(0,iaa.Add((0, 50)))),
+        # iaa.AddToHueAndSaturation((-50, 50), per_channel=True)
+        
+        # /////////////////////////
+        # /// NOT WORKING WITH ////
+        # ////// THE 0.2.9 ////////
+        # //// IMAUG VERSION //////
+        # /////////////////////////
 
-#create a next generation of augmented img
-#augmented_images_df = image_aug(labels_df, 'train_image_folder/', 'aug_images/', 'aug2_', aug)
+        #iaa.RandAugment(n=(0, 3)) # ==> DON'T WORK WITH BOUNDING BOX 
+        #iaa.BlendAlphaCheckerboard(nb_rows=2, nb_cols=(1, 4),foreground=iaa.AddToHue((-100, 100)))
+        #iaa.BlendAlphaHorizontalLinearGradient(iaa.TotalDropout(1.0),min_value=0.2, max_value=0.8)
+        #iaa.BlendAlphaSimplexNoise(iaa.EdgeDetect(1.0))
+        #iaa.Solarize(0.5, threshold=(32, 128)), 
+        #iaa.WithHueAndSaturation(iaa.WithChannels(0, iaa.Add((0, 50))))
+    ])
 
+    labels_df = xml_to_csv('vanilla_dataset_annot/')
+    labels_df.to_csv(('labels.csv'), index=None)
 
-# Concat resized_images_df and augmented_images_df together and save in a new all_labels.csv file
-all_labels_df = pd.concat([labels_df, augmented_images_df])
-all_labels_df.to_csv('all_labels.csv', index=False)
-csv_to_xml(augmented_images_df, 'aug_images/')
+    for i in range(number_of_data_augmentation):
 
-# Lastly we can copy all our augmented images in the same folder as original resized images
-# for file in os.listdir('aug_images'):
-#     shutil.copy('aug_images/'+file, 'train_image_folder/'+file)
+        prefix = "aug{}_".format(i+last_gen+1)
+        augmented_images_df = image_aug(labels_df, 'vanilla_dataset_img/', 'aug_images/', prefix, aug)
+        csv_to_xml(augmented_images_df, 'aug_images/')
+
+        # Concat resized_images_df and augmented_images_df together and save in a new all_labels.csv file
+        if(i==0):
+            all_labels_df = pd.concat([labels_df, augmented_images_df])
+        else:
+            all_labels_df = pd.concat([all_labels_df, augmented_images_df])
+
+    all_labels_df.to_csv('all_labels.csv', index=False)
+    
+    del_unique_file()
+
+    # Lastly we can copy all our augmented images in the same folder as original resized images
+    for file in os.listdir('aug_images/'):
+        shutil.copy('aug_images/'+file, 'train_image_folder/'+file)
+    for file in os.listdir("aug_annot/"):
+        shutil.copy('aug_annot/'+file, 'train_annot_folder/'+file)
+        
+if __name__ == '__main__':
+    argparser = argparse.ArgumentParser(description='augment a dataset')
+
+    argparser.add_argument('-n', '--number_of_dataset_augmentation', default='1', help='time the entire dataset will be augmented, with 3, a 1000 files dataset will generate 3000 files, the new dataset will have a size of 4000')
+    argparser.add_argument('-l', '--number_of_the_last_dataset_augmentation', default='1', help='number of the last generation of data_augmentation')   
+
+    args = argparser.parse_args()
+    _main_(args)
