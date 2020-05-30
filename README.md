@@ -3,7 +3,7 @@ MIT License
 
 Copyright (c) 2017 Ngoc Anh Huynh
 
-For any question, check first the issues on the original repository : https://github.com/experiencor/keras-yolo3/
+For any question (except the data augmentation), check first the issues on the original repository : https://github.com/experiencor/keras-yolo3/
 ## Todo list:
 - [x] Yolo3 detection
 - [x] Yolo3 training (warmup and multi-scale)
