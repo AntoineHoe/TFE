@@ -10,7 +10,7 @@ For any question, check first the issues on the original repository : https://gi
 - [x] mAP Evaluation
 - [x] Multi-GPU training
 - [x] Evaluation on VOC
-- [ ] Data Augmentation
+- [x] Data Augmentation
 
 ## Installing
 
@@ -54,9 +54,26 @@ Also, if you've got the dataset split into 2 folders such as one for images and 
 # 3rd param - number of random choices (aka the size of the validation set in absolute value)
 # 4th param - folder where validation images/annots end up (must have images/annots folders inside the given directory as the 4th param)
 ```
-### 2. Data Augmentation
+### 2. Data Augmentation (XML files only)
 
-Currently working on it
+Create a "vanilla_dataset_annot" where you put all of your XML files
+Create a "vanilla_dataset_img" where you put all of your images
+
+These two folder will be the bedrock of the data augmentation
+
+```python augment_data.py -n 2 -l 0```
+
+With this command line, you will create 2 augmented image based on only 1 image from the vanilla dataset
+The second parameter is the number of previous data augmentation you did
+
+If you realize it is not enough, you can create more augmented images with 
+
+```python augment_data.py -n 10 -l 2```
+ 
+ As you already created 2 data augmentation, you set the seconde parameter to 2.
+That way, it will create the 3 to 12 generation of data augmentation
+
+After the data augmentation, the images and XML files will be copy to the train_image and train_annot folders
 
 ### 3. Edit the configuration file
 The configuration file is a json file, which looks like this:
