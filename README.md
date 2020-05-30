@@ -63,7 +63,7 @@ These two folder will be the bedrock of the data augmentation
 
 ```python augment_data.py -n 2 -l 0```
 
-With this command line, you will create 2 augmented image based on only 1 image from the vanilla dataset
+With this command line, you will create 2 augmented image based on only 1 image from the vanilla dataset.
 The second parameter is the number of previous data augmentation you did
 
 If you realize it is not enough, you can create more augmented images with 
