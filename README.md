@@ -56,24 +56,28 @@ Also, if you've got the dataset split into 2 folders such as one for images and 
 ```
 ### 2. Data Augmentation (XML files only)
 
-Create a "vanilla_dataset_annot" where you put all of your XML files
-Create a "vanilla_dataset_img" where you put all of your images
+Create a "vanilla_dataset_annot" where you put all of your XML files.
+Create a "vanilla_dataset_img" where you put all of your images.
 
-These two folder will be the bedrock of the data augmentation
+These two folder will be the bedrock of the data augmentation : every data augmentation will be based on these folder.
+
+create a "aug_images" and "aug_annot" folder : these two folders will be fill by the new created images and xml annotation.
 
 ```python augment_data.py -n 2 -l 0```
 
 With this command line, you will create 2 augmented image based on only 1 image from the vanilla dataset.
-The second parameter is the number of previous data augmentation you did
+The second parameter is the number of previous data augmentation you did.
 
-If you realize it is not enough, you can create more augmented images with 
+The new augmented images and annotation files will be copy to the train folders.
+
+If you realize it is not enough, you can create more augmented images with.
 
 ```python augment_data.py -n 10 -l 2```
  
- As you already created 2 data augmentation, you set the seconde parameter to 2.
-That way, it will create the 3 to 12 generation of data augmentation
-
-After the data augmentation, the images and XML files will be copy to the train_image and train_annot folders
+As you already created 2 data augmentation, you have to set the seconde parameter to 2.
+That way, it will create the 3 to 12 generation of data augmentation.
+If you don't you may overwrite the previous data augmentation.
+After the data augmentation, the augmented images and XML files will be copy to the train_image and train_annot folders
 
 ### 3. Edit the configuration file
 The configuration file is a json file, which looks like this:
