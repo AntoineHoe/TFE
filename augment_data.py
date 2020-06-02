@@ -1,4 +1,5 @@
 
+# thanks to this tutorial https://medium.com/@a.karazhay/guide-augment-images-and-multiple-bounding-boxes-for-deep-learning-in-4-steps-with-the-notebook-9b263e414dac
 # thanks to this reddit post : https://www.reddit.com/r/learnpython/comments/4ury67/elementtree_and_deeply_nested_xml/
 
 import imgaug as ia
@@ -18,7 +19,6 @@ import glob
 import xml.etree.ElementTree as ET
 import shutil
 import os
-#print(imgaug.__version__)
 
 def del_unique_file():
 
