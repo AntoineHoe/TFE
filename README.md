@@ -48,7 +48,7 @@ There is a one-to-one correspondence by file name between images and annotations
 
 Also, if you've got the dataset split into 2 folders such as one for images and the other one for annotations and you need to set a custom size for the validation set, use `selectrandom.py` script to that. The script expects the following parameters in the following order:
 ```
-./create_validation_set.sh $param1 $param2 $param3 
+python3 selectrandom.py $param1 $param2 $param3 
 
 # 1st param - ratio of files to transfer from the trains folder to the annotation one 
 Between 0 and 1
