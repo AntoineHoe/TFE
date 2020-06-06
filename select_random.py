@@ -58,8 +58,8 @@ def _main_(args):
         print("{} files will be move from train to valid".format(number_file_to_separate))
 
         random_file=random.choice(os.listdir(image_source+"\\"))
-        listImg.append(random_file[6:-4])
-        print("The {} files will be move".format(random_file[6:-4]))
+        listImg.append(random_file[:-4])
+        print("The {} files will be move".format(random_file[:-4]))
 
     else:
         print('Image or annot folder does not have the same amount of files')
@@ -69,7 +69,7 @@ def _main_(args):
         #select one random file
         random_file=random.choice(os.listdir(image_source+"\\"))
 
-        random_file= random_file[6:-4]
+        random_file= random_file[:-4]
 
         print("The {} files will be move".format(random_file))
 
@@ -85,7 +85,7 @@ def _main_(args):
                 print("File {} already selected".format(random_file))
                 print("Choosing a new file")
                 random_file=random.choice(os.listdir(image_source+"\\"))
-                random_file= random_file[6:-4]
+                random_file= random_file[:-4]
                 number_of_file_already_present +=1
                 
             # add the file if not currently in the list
@@ -96,8 +96,8 @@ def _main_(args):
 
     #move selected file to valid folders
     for i in listImg:
-        image = "image_"+i+".jpg"
-        annot = "image_"+i+".xml"
+        image = i+".jpg"
+        annot = i+".xml"
         os.rename(os.path.join(image_source, image),os.path.join(image_valid_dest, image))
         os.rename(os.path.join(annot_source, annot),os.path.join(annot_valid_dest, annot))
 
