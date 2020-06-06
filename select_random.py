@@ -5,7 +5,7 @@ import random
 import time
 
 def makedirs(path):
-    print("creating validation folders")
+    print("creating {} folder".format(path[:-1]))
     try:
         os.makedirs(path)
     except FileExistsError:
@@ -21,8 +21,6 @@ def _main_(args):
     image_source = args.image_source
     annot_source = args.annot_source
 
-    img_train_dest_folder = "train_image_folder\\"
-    annot_train_dest_folder = "train_annot_folder\\"
     img_valid_dest_folder = "valid_image_folder\\"
     annot_valid_dest_folder = "valid_annot_folder\\"
 
@@ -34,8 +32,6 @@ def _main_(args):
 
     image_source = os.path.join(absolut_path, image_source)
     annot_source = os.path.join(absolut_path, annot_source)
-    print(image_source)
-    print(annot_source)
 
     image_valid_dest = os.path.join(absolut_path, img_valid_dest_folder)
     annot_valid_dest = os.path.join(absolut_path, annot_valid_dest_folder)
@@ -50,35 +46,32 @@ def _main_(args):
         exit()
 
     # check if 
-    # the image folder exist
-    # the annot folder exist
     # they have both the same number of files
 
     if len(os.listdir(image_source)) == len(os.listdir(annot_source)):
 
         #calculate the numbe of img/annot to transfer
         number_img = len(os.listdir(image_source))
-        print("{} files in both folders".format(number_img))
+        print("{} files in both train folders".format(number_img))
 
-        number_img_to_separate = math.ceil(number_img * ratio)
-        print("{} files will be move from train to valid".format(number_img_to_separate))
+        number_file_to_separate = math.ceil(number_img * ratio)
+        print("{} files will be move from train to valid".format(number_file_to_separate))
 
         random_file=random.choice(os.listdir(image_source+"\\"))
-        print("{} will be moved".format(random_file))
-
         listImg.append(random_file[6:-4])
+        print("The {} files will be move".format(random_file[6:-4]))
 
     else:
-        print('Image or annot folder does not exist or they does not have the same number of files')
+        print('Image or annot folder does not have the same amount of files')
 
     #for the number of file to randomly select
-    for i in range(number_img_to_separate):
+    for i in range(number_file_to_separate):
         #select one random file
         random_file=random.choice(os.listdir(image_source+"\\"))
 
         random_file= random_file[6:-4]
 
-        print("This is the random file : {}".format(random_file))
+        print("The {} files will be move".format(random_file))
 
         #check if already in the list
 
@@ -100,7 +93,7 @@ def _main_(args):
                 
                 listImg.append(random_file)
                 alReadyIn = True
-                
+
     #move selected file to valid folders
     for i in listImg:
         image = "image_"+i+".jpg"
