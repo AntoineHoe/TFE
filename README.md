@@ -124,9 +124,9 @@ The configuration file is a json file, which looks like this:
     },
 
     "valid": {
-        "valid_image_folder":   "",
-        "valid_annot_folder":   "",
-        "cache_name":           "",
+        "valid_image_folder":   "valid_image_folder\\",
+        "valid_annot_folder":   "valid_annot_folder\\",
+        "cache_name":           "validation_defect_aug.pkl",
 
         "valid_times":          1
     }
