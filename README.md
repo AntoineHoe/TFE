@@ -46,13 +46,21 @@ Organize the dataset into 4 folders:
     
 There is a one-to-one correspondence by file name between images and annotations. If the validation set is empty, the training set will be automatically splitted into the training set and validation set using the ratio of 0.8.
 
-Also, if you've got the dataset split into 2 folders such as one for images and the other one for annotations and you need to set a custom size for the validation set, use `create_validation_set.sh` script to that. The script expects the following parameters in the following order:
-```bash
-./create_validation_set.sh $param1 $param2 $param3 $param4
-# 1st param - folder where the images are found
-# 2nd param - folder where the annotations are found
-# 3rd param - number of random choices (aka the size of the validation set in absolute value)
-# 4th param - folder where validation images/annots end up (must have images/annots folders inside the given directory as the 4th param)
+Also, if you've got the dataset split into 2 folders such as one for images and the other one for annotations and you need to set a custom size for the validation set, use `selectrandom.py` script to that. The script expects the following parameters in the following order:
+```
+./create_validation_set.sh $param1 $param2 $param3 
+
+# 1st param - ratio of files to transfer from the trains folder to the annotation one 
+Between 0 and 1
+Exemple : 
+    selectrandom.py -r 0.3
+will randomly transfer 30% of the train files
+
+# 2nd param - folder where the images are found
+# 3rd param - folder where the annotations are found
+
+exemple :
+python3 selectrandom.py  -r 0.25 -i train_image_folder -a train_annot_folder
 ```
 ### 2. Data Augmentation (XML files only)
 
