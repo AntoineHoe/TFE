@@ -2,7 +2,6 @@ import argparse
 import os
 import math
 import random
-import time
 
 def makedirs(path):
     print("creating {} folder".format(path[:-1]))
