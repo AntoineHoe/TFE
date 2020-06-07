@@ -1,5 +1,4 @@
 
-# thanks to this tutorial https://medium.com/@a.karazhay/guide-augment-images-and-multiple-bounding-boxes-for-deep-learning-in-4-steps-with-the-notebook-9b263e414dac
 # thanks to this reddit post : https://www.reddit.com/r/learnpython/comments/4ury67/elementtree_and_deeply_nested_xml/
 
 import imgaug as ia
@@ -224,9 +223,12 @@ def xml_to_csv(path):
             #all the information we need is add in one list
             for tag, text in results:
                 img.append(text)
+        #print(img)
 
         #the img list looks like this : 
+
         # ['filename', 'width', 'height', 'name', 'xmin', 'ymin', 'xmax', 'ymax',  'name' ,[...] 'ymin', 'xmax', 'ymax']
+
         # with a repeted sequence ['name', 'xmin', 'ymin', 'xmax', 'ymax'] for each defect contained in the xml file
 
 
@@ -260,20 +262,20 @@ def _main_(args) :
     number_of_data_augmentation = int(args.number_of_dataset_augmentation)
     last_gen = int(args.number_of_the_last_dataset_augmentation)
 
-    aug = iaa.SomeOf(2, [    
-        # FIRST GEN OF DATA AUGMENTATION
+    aug = iaa.SomeOf(3, [    
+        #FIRST GEN OF DATA AUGMENTATION
         iaa.Affine(scale=(0.8, 1.2)),
         iaa.Affine(rotate=(-30, 30)),
         iaa.Affine(translate_percent={"x":(-0.2, 0.2),"y":(-0.2, 0.2)}),
-        iaa.Fliplr(1)
+        iaa.Fliplr(1),
 
-        # iaa.SaltAndPepper(0.1, per_channel=True),
-        # iaa.Add((-40, 40), per_channel=0.5),
-        # iaa.AdditiveGaussianNoise(scale=(0, 0.2*255)),
-        # iaa.Multiply((0.5, 1.5), per_channel=0.5),
-        # iaa.AverageBlur(k=((5, 11), (1, 3))),
-        # iaa.WithColorspace(to_colorspace="HSV",from_colorspace="RGB",children=iaa.WithChannels(0,iaa.Add((0, 50)))),
-        # iaa.AddToHueAndSaturation((-50, 50), per_channel=True)
+        iaa.SaltAndPepper(0.1, per_channel=True),
+        iaa.Add((-40, 40), per_channel=0.5),
+        iaa.AdditiveGaussianNoise(scale=(0, 0.2*255)),
+        iaa.Multiply((0.5, 1.5), per_channel=0.5),
+        iaa.AverageBlur(k=((5, 11), (1, 3))),
+        iaa.WithColorspace(to_colorspace="HSV",from_colorspace="RGB",children=iaa.WithChannels(0,iaa.Add((0, 50)))),
+        iaa.AddToHueAndSaturation((-50, 50), per_channel=True),
         
         # /////////////////////////
         # /// NOT WORKING WITH ////
@@ -281,21 +283,21 @@ def _main_(args) :
         # //// IMAUG VERSION //////
         # /////////////////////////
 
-        #iaa.RandAugment(n=(0, 3)) # ==> DON'T WORK WITH BOUNDING BOX 
-        #iaa.BlendAlphaCheckerboard(nb_rows=2, nb_cols=(1, 4),foreground=iaa.AddToHue((-100, 100)))
-        #iaa.BlendAlphaHorizontalLinearGradient(iaa.TotalDropout(1.0),min_value=0.2, max_value=0.8)
-        #iaa.BlendAlphaSimplexNoise(iaa.EdgeDetect(1.0))
-        #iaa.Solarize(0.5, threshold=(32, 128)), 
-        #iaa.WithHueAndSaturation(iaa.WithChannels(0, iaa.Add((0, 50))))
+        #iaa.RandAugment(n=(0, 3)), # ==> DON'T WORK WITH BOUNDING BOX 
+        #iaa.BlendAlphaCheckerboard(nb_rows=2, nb_cols=(1, 4),foreground=iaa.AddToHue((-100, 100))),
+        #iaa.BlendAlphaHorizontalLinearGradient(iaa.TotalDropout(1.0),min_value=0.2, max_value=0.8),
+        #iaa.BlendAlphaSimplexNoise(iaa.EdgeDetect(1.0)),
+        iaa.Solarize(0.5, threshold=(32, 128)), 
+        iaa.WithHueAndSaturation(iaa.WithChannels(0, iaa.Add((0, 50))))
     ])
 
-    labels_df = xml_to_csv('vanilla_dataset_annot/')
+    labels_df = xml_to_csv('train_annot_folder/')
     labels_df.to_csv(('labels.csv'), index=None)
 
     for i in range(number_of_data_augmentation):
 
         prefix = "aug{}_".format(i+last_gen+1)
-        augmented_images_df = image_aug(labels_df, 'vanilla_dataset_img/', 'aug_images/', prefix, aug)
+        augmented_images_df = image_aug(labels_df, 'train_image_folder/', 'aug_images/', prefix, aug)
         csv_to_xml(augmented_images_df, 'aug_images/')
 
         # Concat resized_images_df and augmented_images_df together and save in a new all_labels.csv file
@@ -314,6 +316,8 @@ def _main_(args) :
     for file in os.listdir("aug_annot/"):
         shutil.copy('aug_annot/'+file, 'train_annot_folder/'+file)
         
+        
+
 if __name__ == '__main__':
     argparser = argparse.ArgumentParser(description='augment a dataset')
 
