@@ -49,14 +49,19 @@ Each image must have a one-to-one correspondance with his annotation file
 ### 0. If your annotations are on csv file 
 
 This repository only work with XML files.
+
 So, this script convert the csv file to XML files.
+
 Example :
+
 ```csv_to_xml.py -c .\bounding_boxes\ -x annot_folder\```
 
 The script work with csv files with this structure  :
 
-``` filename,width,height,name,xmin,ymin,xmax,ymax  ```
-where 
+``` filename,width,height,name,xmin,ymin,xmax,ymax```
+
+where :
+
 - the filename is the name of the image
 - the width and height are the image shape
 - the name is the class of the object
@@ -75,6 +80,7 @@ python3 csv_to_xml.py -c $param1 -x $param2
 ### 1. Data Augmentation (optionnal)
 
 Create a "vanilla_dataset_annot" where you put all of your XML files.
+
 Create a "vanilla_dataset_img" where you put all of your images.
 
 These two folder will be the bedrock of the data augmentation : every data augmentation will be based on these folders.
@@ -84,6 +90,7 @@ Create a "aug_images" and "aug_annot" folder : these two folders will be fill by
 ```python augment_data.py -n 2 -l 0```
 
 With this command line, you will create 2 augmented image based on only 1 image from the vanilla dataset.
+
 The second parameter is the number of previous data augmentation you did.
 
 The new augmented images and annotation files will be copy to the train folders.
