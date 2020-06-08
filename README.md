@@ -48,9 +48,7 @@ Each image must have a one-to-one correspondance with his annotation file
 
 ### 0. If your annotations are on csv file 
 
-This repository only work with XML files.
-
-So, this script convert the csv file to XML files.
+This repository only work with XML files. So, this script convert the csv file to XML.
 
 Example :
 
