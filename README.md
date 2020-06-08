@@ -4,6 +4,7 @@ MIT License
 Copyright (c) 2017 Ngoc Anh Huynh
 
 For any question (except the data augmentation), check first the issues on the original repository : https://github.com/experiencor/keras-yolo3/
+
 ## Todo list:
 - [x] Yolo3 detection
 - [x] Yolo3 training (warmup and multi-scale)
@@ -11,6 +12,7 @@ For any question (except the data augmentation), check first the issues on the o
 - [x] Multi-GPU training
 - [x] Evaluation on VOC
 - [x] Data Augmentation
+- [x] csv files compatible
 
 ## Installing
 
@@ -20,7 +22,7 @@ pip install -r requirements.txt
 ```
 And for the GPU to work, make sure you've got the drivers installed beforehand (CUDA).
 
-It has been tested to work with Python 2.7.13 and 3.5.3.
+It has been tested to work with Python 2.7.13 and 3.6
 
 ## Detection
 
@@ -30,9 +32,7 @@ Grab the pretrained weights of yolo3 from https://pjreddie.com/media/files/yolov
 
 ## Training
 
-### 1. Data preparation 
-
-Download the Raccoon dataset from from https://github.com/experiencor/raccoon_dataset.
+### Data preparation 
 
 Organize the dataset into 4 folders:
 
@@ -43,33 +43,43 @@ Organize the dataset into 4 folders:
 + valid_image_folder <= the folder that contains the validation images.
 
 + valid_annot_folder <= the folder that contains the validation annotations in VOC format.
-    
-There is a one-to-one correspondence by file name between images and annotations. If the validation set is empty, the training set will be automatically splitted into the training set and validation set using the ratio of 0.8.
 
-Also, if you've got the dataset split into 2 folders such as one for images and the other one for annotations and you need to set a custom size for the validation set, use `selectrandom.py` script to that. The script expects the following parameters in the following order:
+Each image must have a one-to-one correspondance with his annotation file
+
+### 0. If your annotations are on csv file 
+
+This repository only work with XML files.
+So, this script convert the csv file to XML files.
+Example :
+```csv_to_xml.py -c .\bounding_boxes\ -x annot_folder\```
+
+The script work with csv files with this structure  :
+
+``` filename,width,height,name,xmin,ymin,xmax,ymax  ```
+where 
+- the filename is the name of the image
+- the width and height are the image shape
+- the name is the class of the object
+- xmin, ymin, xmax, ymax are the object coordinates
+
+The parameters are :
+
 ```
-python3 selectrandom.py $param1 $param2 $param3 
+python3 csv_to_xml.py -c $param1 -x $param2  
 
-# 1st param - ratio of files to transfer from the trains folder to the annotation one 
-Between 0 and 1
-Exemple : 
-    selectrandom.py -r 0.3
-will randomly transfer 30% of the train files
+# 1st param - folder of the csv files
 
-# 2nd param - folder where the images are found
-# 3rd param - folder where the annotations are found
-
-exemple :
-python3 selectrandom.py  -r 0.25 -i train_image_folder -a train_annot_folder
+# 2nd param - folder where the XML files will be write
 ```
-### 2. Data Augmentation (XML files only)
+
+### 1. Data Augmentation (optionnal)
 
 Create a "vanilla_dataset_annot" where you put all of your XML files.
 Create a "vanilla_dataset_img" where you put all of your images.
 
-These two folder will be the bedrock of the data augmentation : every data augmentation will be based on these folder.
+These two folder will be the bedrock of the data augmentation : every data augmentation will be based on these folders.
 
-create a "aug_images" and "aug_annot" folder : these two folders will be fill by the new created images and xml annotation.
+Create a "aug_images" and "aug_annot" folder : these two folders will be fill by the new created images and xml annotation.
 
 ```python augment_data.py -n 2 -l 0```
 
@@ -86,6 +96,30 @@ As you already created 2 data augmentation, you have to set the seconde paramete
 That way, it will create the 3 to 12 generation of data augmentation.
 If you don't you may overwrite the previous data augmentation.
 After the data augmentation, the augmented images and XML files will be copy to the train_image and train_annot folders
+
+### 2. Data separation
+
+There is a one-to-one correspondence by file name between images and annotations. If the validation set is empty, the training set will be automatically splitted into the training set and validation set using the ratio of 0.8. All of the information will be then contain into pkl files (cache file).
+The train pkl file will be generated at the anchors step.
+The valid pkl file will be generated at the train step.
+
+Otherwise, if you've got the dataset split into 2 folders such as one for images and the other one for annotations and you need to set a custom size for the validation set, use `selectrandom.py` script. The script expects the following parameters in the following order:
+```
+python3 selectrandom.py $param1 $param2 $param3 
+
+# 1st param - ratio of files to transfer from the trains folder to the annotation one 
+Between 0 and 1
+Exemple : 
+    selectrandom.py -r 0.3
+will randomly transfer 30% of the train files to the valid folders (valid_image_folder and valid_annot_folder)
+
+# 2nd param - folder where the images are found
+# 3rd param - folder where the annotations are found
+
+exemple :
+python3 selectrandom.py  -r 0.25 -i train_image_folder -a train_annot_folder
+```
+Good practices suggest between a 80%-20% and 90%-10% ratio for the train-valid
 
 ### 3. Edit the configuration file
 The configuration file is a json file, which looks like this:
