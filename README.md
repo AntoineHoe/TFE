@@ -165,8 +165,9 @@ The configuration file is a json file, which looks like this:
 
 
 ```
-For a deployment on a jetson TX2, I used a repository that was not compatible with h5 model file. 
-To do so I just changed  the ```"saved_weights_name":   "defect.h5",``` to ```"saved_weights_name":   "defect.weights",``` 
+For a deployment on a jetson TX2, I used a repository (link at the bottom) that was not compatible with h5 model file. 
+To do so I just changed  the ```"saved_weights_name":   "defect.h5",``` to ```"saved_weights_name":   "defect.weights",```.
+
 The ```labels``` setting lists the labels to be trained on. Only images, which has labels being listed, are fed to the network. The rest images are simply ignored. By this way, a Dog Detector can easily be trained using VOC or COCO dataset by setting ```labels``` to ```['dog']```.
 
 Download pretrained weights for backend at:
