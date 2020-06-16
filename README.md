@@ -169,8 +169,8 @@ For a deployment on a jetson TX2, I used a repository (link at the bottom) that 
 To do so I just changed  the ```"saved_weights_name":   "defect.h5",``` to ```"saved_weights_name":   "defect.weights",```.
 I also set the input to 416, like that :
 ```
-        "min_input_size":       288,
-        "max_input_size":       448,
+        "min_input_size":       416,
+        "max_input_size":       416,
 ```
 There are also 2 other size compatible with the other repository : 288 and 608
 
