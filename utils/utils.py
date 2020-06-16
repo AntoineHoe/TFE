@@ -231,6 +231,7 @@ def normalize(image):
     return image/255.
        
 def get_yolo_boxes(model, images, net_h, net_w, anchors, obj_thresh, nms_thresh):
+
     image_h, image_w, _ = images[0].shape
     nb_images           = len(images)
     batch_input         = np.zeros((nb_images, net_h, net_w, 3))
