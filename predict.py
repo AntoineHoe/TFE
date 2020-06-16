@@ -56,7 +56,7 @@ def _main_(args):
                 break  # esc to quit
         cv2.destroyAllWindows()        
     elif input_path[-4:] == '.mp4': # do detection on a video  
-        video_out = output_path + input_path.split('/')[-1]
+        video_out = output_path + input_path.split('\\')[-1]
         video_reader = cv2.VideoCapture(input_path)
 
         nb_frames = int(video_reader.get(cv2.CAP_PROP_FRAME_COUNT))
@@ -65,27 +65,27 @@ def _main_(args):
 
         video_writer = cv2.VideoWriter(video_out,
                                cv2.VideoWriter_fourcc(*'MPEG'), 
-                               50.0, 
+                               20.0, 
                                (frame_w, frame_h))
         # the main loop
         batch_size  = 1
         images      = []
         start_point = 0 #%
-        show_window = False
+        show_window = True
         for i in tqdm(range(nb_frames)):
             _, image = video_reader.read()
-
+            #print("I am here biatch !!!")
             if (float(i+1)/nb_frames) > start_point/100.:
                 images += [image]
-
+                #print("I am here biatch !!!")
                 if (i%batch_size == 0) or (i == (nb_frames-1) and len(images) > 0):
                     # predict the bounding boxes
                     batch_boxes = get_yolo_boxes(infer_model, images, net_h, net_w, config['model']['anchors'], obj_thresh, nms_thresh)
-
+                    #print("I am here biatch !!!")
                     for i in range(len(images)):
                         # draw bounding boxes on the image using labels
                         draw_boxes(images[i], batch_boxes[i], config['model']['labels'], obj_thresh)   
-
+                        #print("I am here biatch !!!")
                         # show the video with detection bounding boxes          
                         if show_window: cv2.imshow('video with bboxes', images[i])  
 
@@ -107,12 +107,14 @@ def _main_(args):
             image_paths += [input_path]
 
         image_paths = [inp_file for inp_file in image_paths if (inp_file[-4:] in ['.jpg', '.png', 'JPEG'])]
-
+        # for element in image_paths:
+        #     print(element)
+        # others_image_path = ([inp_file for inp_file in image_paths if (inp_file[-5:] in ['.jfif'])])
+        # for new_element in others_image_path:
+        #     print(element)
         # the main loop
         for image_path in image_paths:
             image = cv2.imread(image_path)
-            print(image_path)
-
             # predict the bounding boxes
             boxes = get_yolo_boxes(infer_model, [image], net_h, net_w, config['model']['anchors'], obj_thresh, nms_thresh)[0]
 
@@ -120,7 +122,8 @@ def _main_(args):
             draw_boxes(image, boxes, config['model']['labels'], obj_thresh) 
      
             # write the image with bounding boxes to file
-            cv2.imwrite(output_path + image_path.split('/')[-1], np.uint8(image))         
+            cv2.imwrite(output_path + image_path.split('\\')[-1], np.uint8(image)) 
+            print(image_path.split('\\'))        
 
 if __name__ == '__main__':
     argparser = argparse.ArgumentParser(description='Predict with a trained yolo model')

@@ -18,7 +18,7 @@ from keras.models import load_model
 
 # for the evaluation
 
-net_h, net_w = 32*15, 32*15
+net_h, net_w = 416, 416
 obj_thresh, nms_thresh = 0.25, 0.25
 iou_threshold = 0.25
 
@@ -257,9 +257,9 @@ def _main_(args):
         class_scale         = config['train']['class_scale']
     )
 
-    ###############################
-    #   Kick off the training
-    ###############################
+    ##############################
+    # Kick off the training
+    ##############################
     callbacks = create_callbacks(config['train']['saved_weights_name'], config['train']['tensorboard_dir'], infer_model)
 
     train_model.fit_generator(
@@ -272,7 +272,7 @@ def _main_(args):
         max_queue_size   = 8
     )
 
-    # make a GPU version of infer_model for evaluation
+    #make a GPU version of infer_model for evaluation
     if multi_gpu > 1:
         infer_model = load_model(config['train']['saved_weights_name'])
 

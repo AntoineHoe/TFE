@@ -160,7 +160,7 @@ def image_aug(df, images_path, aug_images_path, image_prefix, augmentor):
         
     #   don't perform any actions with the image if there are no bounding boxes left in it    
         if re.findall('Image...', str(bbs_aug)) == ['Image([]']:
-            print("{} met an issue".format(filename))
+            #print("{} met an issue".format(filename))
             defect_augmented_img.append(filename)
             pass
         
@@ -226,9 +226,7 @@ def xml_to_csv(path):
         #print(img)
 
         #the img list looks like this : 
-
         # ['filename', 'width', 'height', 'name', 'xmin', 'ymin', 'xmax', 'ymax',  'name' ,[...] 'ymin', 'xmax', 'ymax']
-
         # with a repeted sequence ['name', 'xmin', 'ymin', 'xmax', 'ymax'] for each defect contained in the xml file
 
 
@@ -269,6 +267,7 @@ def _main_(args) :
         iaa.Affine(translate_percent={"x":(-0.2, 0.2),"y":(-0.2, 0.2)}),
         iaa.Fliplr(1),
 
+        #SECOND GEN OF DATA AUGMENTATION
         iaa.SaltAndPepper(0.1, per_channel=True),
         iaa.Add((-40, 40), per_channel=0.5),
         iaa.AdditiveGaussianNoise(scale=(0, 0.2*255)),
@@ -276,12 +275,6 @@ def _main_(args) :
         iaa.AverageBlur(k=((5, 11), (1, 3))),
         iaa.WithColorspace(to_colorspace="HSV",from_colorspace="RGB",children=iaa.WithChannels(0,iaa.Add((0, 50)))),
         iaa.AddToHueAndSaturation((-50, 50), per_channel=True),
-        
-        # /////////////////////////
-        # /// NOT WORKING WITH ////
-        # ////// THE 0.2.9 ////////
-        # //// IMAUG VERSION //////
-        # /////////////////////////
 
         #iaa.RandAugment(n=(0, 3)), # ==> DON'T WORK WITH BOUNDING BOX 
         #iaa.BlendAlphaCheckerboard(nb_rows=2, nb_cols=(1, 4),foreground=iaa.AddToHue((-100, 100))),
@@ -291,13 +284,13 @@ def _main_(args) :
         iaa.WithHueAndSaturation(iaa.WithChannels(0, iaa.Add((0, 50))))
     ])
 
-    labels_df = xml_to_csv('train_annot_folder/')
+    labels_df = xml_to_csv('vanilla_dataset_annot/')
     labels_df.to_csv(('labels.csv'), index=None)
 
     for i in range(number_of_data_augmentation):
 
         prefix = "aug{}_".format(i+last_gen+1)
-        augmented_images_df = image_aug(labels_df, 'train_image_folder/', 'aug_images/', prefix, aug)
+        augmented_images_df = image_aug(labels_df, 'vanilla_dataset_img/', 'aug_images/', prefix, aug)
         csv_to_xml(augmented_images_df, 'aug_images/')
 
         # Concat resized_images_df and augmented_images_df together and save in a new all_labels.csv file

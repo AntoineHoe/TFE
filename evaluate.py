@@ -11,6 +11,11 @@ from utils.utils import normalize, evaluate
 from keras.callbacks import EarlyStopping, ModelCheckpoint
 from keras.optimizers import Adam
 from keras.models import load_model
+#import matplotlib.pyplot as plt 
+
+net_h, net_w = 416, 416
+obj_thresh, nms_thresh = 0.5, 0.5
+iou_threshold = 0.5
 
 def _main_(args):
     config_path = args.conf
@@ -54,7 +59,11 @@ def _main_(args):
     infer_model = load_model(config['train']['saved_weights_name'])
 
     # compute mAP for all the classes
-    average_precisions = evaluate(infer_model, valid_generator)
+    average_precisions = evaluate(infer_model, valid_generator, iou_threshold=iou_threshold,obj_thresh=obj_thresh, nms_thresh=nms_thresh, net_h=net_h,  net_w=net_w)
+    # print("recall : {}".format(recall))
+    # print("precision : {}".format(precision))
+    # plt.plot(recall, precision)
+    # plt.show()
 
     # print the score
     for label, average_precision in average_precisions.items():
