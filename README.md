@@ -198,3 +198,7 @@ If you wish to change the object threshold or IOU threshold, you can do it by al
 `python evaluate.py -c config.json`
 
 Compute the mAP performance of the model defined in `saved_weights_name` on the validation dataset defined in `valid_image_folder` and `valid_annot_folder`.
+
+## Deployment on Jetson TX2
+
+I've use this repository to deploy the model on the Jetson TX2 : https://github.com/jkjung-avt/tensorrt_demos
